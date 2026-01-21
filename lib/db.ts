@@ -107,7 +107,7 @@ export async function createTransaction(
 ) {
   const { rows } = await sql<Transaction>`
     INSERT INTO transactions (user_id, person_name, amount, type, description, transaction_date, due_date)
-    VALUES (${userId}, ${personName}, ${amount}, ${type}, ${description || null}, ${transactionDate || new Date()}, ${dueDate || null})
+    VALUES (${userId}, ${personName}, ${amount}, ${type}, ${description || null}, ${(transactionDate || new Date()).toISOString()}, ${dueDate ? dueDate.toISOString() : null})
     RETURNING *
   `;
   return rows[0];
