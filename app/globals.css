@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+    --card: 222 40% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 40% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 222 40% 12%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 40% 12%;
+    --muted-foreground: 215 16% 55%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 40% 15%;
+    --input: 222 40% 12%;
+    --ring: 262 83% 58%;
+    --radius: 1rem;
+
+    /* Success & Warning */
+    --success: 142 76% 45%;
+    --success-foreground: 138 76% 97%;
+    --warning: 0 84% 60%;
+    --warning-foreground: 48 96% 12%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background: #0a0d14;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: hsl(var(--foreground));
+    font-feature-settings: 'ss01', 'cv01', 'cv03';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Luxury Glass Card Effect */
+@layer utilities {
+  .glass-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 8px 32px 0 rgba(0, 0, 0, 0.37),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card-hover:hover {
+    background: rgba(20, 28, 47, 0.8);
+    border-color: rgba(124, 58, 237, 0.3);
+    transform: translateY(-2px);
+    box-shadow:
+      0 20px 40px 0 rgba(124, 58, 237, 0.2),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .gradient-glow {
+    position: relative;
+  }
+
+  .gradient-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(14, 165, 233, 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .gradient-glow:hover::before {
+    opacity: 1;
+  }
+
+  .balance-card {
+    background: linear-gradient(135deg,
+      rgba(124, 58, 237, 0.15) 0%,
+      rgba(15, 23, 42, 0.9) 50%,
+      rgba(14, 165, 233, 0.1) 100%
+    );
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    box-shadow:
+      0 20px 60px -10px rgba(124, 58, 237, 0.3),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .cta-button {
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+    box-shadow:
+      0 4px 15px 0 rgba(124, 58, 237, 0.4),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cta-button:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    box-shadow:
+      0 8px 25px 0 rgba(124, 58, 237, 0.6),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .cta-button:active {
+    transform: translateY(0);
+  }
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Mobile-optimized scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
+}
+
+/* Safe area for mobile notches */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+@plugin "tailwindcss-animate";
