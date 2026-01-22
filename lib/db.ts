@@ -135,10 +135,25 @@ export async function createPayment(
 }
 
 export async function getPersonBalances(userId: string): Promise<PersonBalance[]> {
-  const { rows } = await sql<PersonBalance>`
-    SELECT
-      person_name,
-      SUM(
+  try {
+    const { rows } = await sql<PersonBalance>`
+      SELECT
+        person_name,
+        SUM(
+          CASE
+            WHEN type = 'lent_out' THEN amount
+            WHEN type = 'borrowed' THEN -amount
+          END
+        ) - COALESCE((
+          SELECT SUM(p.amount)
+          FROM payments p
+          WHERE p.transaction_id = transactions.id
+        ), 0) as balance,
+        COUNT(DISTINCT transactions.id) as transaction_count
+      FROM transactions
+      WHERE user_id = ${userId}
+      GROUP BY person_name
+      HAVING SUM(
         CASE
           WHEN type = 'lent_out' THEN amount
           WHEN type = 'borrowed' THEN -amount
@@ -147,24 +162,14 @@ export async function getPersonBalances(userId: string): Promise<PersonBalance[]
         SELECT SUM(p.amount)
         FROM payments p
         WHERE p.transaction_id = transactions.id
-      ), 0) as balance,
-      COUNT(DISTINCT transactions.id) as transaction_count
-    FROM transactions
-    WHERE user_id = ${userId}
-    GROUP BY person_name
-    HAVING SUM(
-      CASE
-        WHEN type = 'lent_out' THEN amount
-        WHEN type = 'borrowed' THEN -amount
-      END
-    ) - COALESCE((
-      SELECT SUM(p.amount)
-      FROM payments p
-      WHERE p.transaction_id = transactions.id
-    ), 0) != 0
-    ORDER BY balance DESC
-  `;
-  return rows;
+      ), 0) != 0
+      ORDER BY balance DESC
+    `;
+    return rows || [];
+  } catch (error) {
+    console.error('Error in getPersonBalances:', error);
+    return [];
+  }
 }
 
 export async function getTotalBalance(userId: string): Promise<number> {
