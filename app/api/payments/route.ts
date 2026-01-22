@@ -22,7 +22,13 @@ export async function GET(request: Request) {
 
     const payments = await getPaymentsByTransaction(parseInt(transactionId));
 
-    return NextResponse.json(payments);
+    // Convert DECIMAL amounts to numbers
+    const normalizedPayments = payments.map(p => ({
+      ...p,
+      amount: parseFloat(p.amount as any),
+    }));
+
+    return NextResponse.json(normalizedPayments);
   } catch (error) {
     console.error('Error fetching payments:', error);
     return NextResponse.json(

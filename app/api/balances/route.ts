@@ -15,11 +15,16 @@ export async function GET(request: Request) {
 
     if (type === 'total') {
       const totalBalance = await getTotalBalance(userId);
-      return NextResponse.json({ total: totalBalance });
+      return NextResponse.json({ total: parseFloat(totalBalance as any) });
     }
 
     const balances = await getPersonBalances(userId);
-    return NextResponse.json(balances || []);
+    // Convert DECIMAL balances to numbers
+    const normalizedBalances = balances.map(b => ({
+      ...b,
+      balance: parseFloat(b.balance as any),
+    }));
+    return NextResponse.json(normalizedBalances || []);
   } catch (error) {
     console.error('Error fetching balances:', error);
     // Returnera tom array vid fel för att undvika .map crashes

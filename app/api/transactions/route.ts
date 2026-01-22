@@ -25,7 +25,13 @@ export async function GET(request: Request) {
       transactions = await getTransactions(userId);
     }
 
-    return NextResponse.json(transactions);
+    // Convert DECIMAL amounts to numbers
+    const normalizedTransactions = transactions.map(t => ({
+      ...t,
+      amount: parseFloat(t.amount as any),
+    }));
+
+    return NextResponse.json(normalizedTransactions);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return NextResponse.json(
