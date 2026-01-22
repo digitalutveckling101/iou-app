@@ -22,15 +22,30 @@ export default function Home() {
         fetch('/api/balances'),
       ]);
 
-      if (!totalRes.ok || !balancesRes.ok) {
-        throw new Error('Failed to fetch data');
+      console.log('Total response:', totalRes.status, totalRes.statusText);
+      console.log('Balances response:', balancesRes.status, balancesRes.statusText);
+
+      if (!totalRes.ok) {
+        const errorText = await totalRes.text();
+        console.error('Total balance error:', errorText);
+        throw new Error(`Failed to fetch total balance: ${totalRes.status}`);
+      }
+
+      if (!balancesRes.ok) {
+        const errorText = await balancesRes.text();
+        console.error('Balances error:', errorText);
+        throw new Error(`Failed to fetch balances: ${balancesRes.status}`);
       }
 
       const totalData = await totalRes.json();
       const balancesData = await balancesRes.json();
 
+      console.log('Total data:', totalData);
+      console.log('Balances data:', balancesData);
+
       setTotalBalance(totalData.total || 0);
       setBalances(Array.isArray(balancesData) ? balancesData : []);
+      setError(null);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Kunde inte hämta data. Försök igen senare.');
