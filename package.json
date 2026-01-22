@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "db:init-prod": "tsx scripts/init-production-db.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.8",

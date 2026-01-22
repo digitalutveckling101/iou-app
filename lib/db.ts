@@ -194,7 +194,11 @@ export async function getTotalBalance(userId: string): Promise<number> {
     WHERE t.user_id = ${userId} AND t.type = 'borrowed'
   `;
 
-  return rows[0].total - (paymentRows[0].total - paymentRows2[0].total);
+  const total = rows[0]?.total || 0;
+  const lentPayments = paymentRows[0]?.total || 0;
+  const borrowedPayments = paymentRows2[0]?.total || 0;
+
+  return total - (lentPayments - borrowedPayments);
 }
 
 export async function deleteTransaction(transactionId: number, userId: string) {
