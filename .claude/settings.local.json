@@ -16,7 +16,11 @@
       "Bash(git init:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(of type 'Primitive'\" error during Vercel build.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nFix UTF-8 encoding issue in lib/db.ts\n\n- Delete and recreate lib/db.ts with clean UTF-8 encoding\n- Maintain all Date to ISO string conversions\n- Fix invalid utf-8 sequence error on Vercel build\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd vercel.json to fix build output configuration\n\n- Configure Next.js 16 build for Vercel\n- Fix \"No Output Directory named 'public'\" error\n- Explicitly set framework to nextjs\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
