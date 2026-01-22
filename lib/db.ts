@@ -26,7 +26,6 @@ export interface PersonBalance {
   transaction_count: number;
 }
 
-// Skapa tabeller (kör detta en gång när du sätter upp databasen)
 export async function createTables() {
   await sql`
     CREATE TABLE IF NOT EXISTS transactions (
@@ -65,7 +64,6 @@ export async function createTables() {
   `;
 }
 
-// Hämta alla transaktioner för en användare
 export async function getTransactions(userId: string) {
   const { rows } = await sql<Transaction>`
     SELECT * FROM transactions
@@ -75,7 +73,6 @@ export async function getTransactions(userId: string) {
   return rows;
 }
 
-// Hämta transaktioner för en specifik person
 export async function getTransactionsByPerson(userId: string, personName: string) {
   const { rows } = await sql<Transaction>`
     SELECT * FROM transactions
@@ -85,7 +82,6 @@ export async function getTransactionsByPerson(userId: string, personName: string
   return rows;
 }
 
-// Hämta betalningar för en transaktion
 export async function getPaymentsByTransaction(transactionId: number) {
   const { rows } = await sql<Payment>`
     SELECT * FROM payments
@@ -95,7 +91,6 @@ export async function getPaymentsByTransaction(transactionId: number) {
   return rows;
 }
 
-// Skapa ny transaktion
 export async function createTransaction(
   userId: string,
   personName: string,
@@ -124,7 +119,6 @@ export async function createTransaction(
   return rows[0];
 }
 
-// Skapa ny betalning
 export async function createPayment(
   transactionId: number,
   amount: number,
@@ -140,7 +134,6 @@ export async function createPayment(
   return rows[0];
 }
 
-// Hämta balans per person
 export async function getPersonBalances(userId: string): Promise<PersonBalance[]> {
   const { rows } = await sql<PersonBalance>`
     SELECT
@@ -174,7 +167,6 @@ export async function getPersonBalances(userId: string): Promise<PersonBalance[]
   return rows;
 }
 
-// Hämta total balans för användaren
 export async function getTotalBalance(userId: string): Promise<number> {
   const { rows } = await sql<{ total: number }>`
     SELECT
@@ -188,7 +180,6 @@ export async function getTotalBalance(userId: string): Promise<number> {
     WHERE user_id = ${userId}
   `;
 
-  // Subtrahera alla betalningar
   const { rows: paymentRows } = await sql<{ total: number }>`
     SELECT COALESCE(SUM(p.amount), 0) as total
     FROM payments p
@@ -206,7 +197,6 @@ export async function getTotalBalance(userId: string): Promise<number> {
   return rows[0].total - (paymentRows[0].total - paymentRows2[0].total);
 }
 
-// Ta bort transaktion
 export async function deleteTransaction(transactionId: number, userId: string) {
   await sql`
     DELETE FROM transactions
