@@ -137,32 +137,28 @@ export async function createPayment(
 export async function getPersonBalances(userId: string): Promise<PersonBalance[]> {
   try {
     const { rows } = await sql<PersonBalance>`
+      WITH transaction_totals AS (
+        SELECT
+          t.person_name,
+          SUM(
+            CASE
+              WHEN t.type = 'lent_out' THEN t.amount
+              WHEN t.type = 'borrowed' THEN -t.amount
+            END
+          ) as transaction_sum,
+          COALESCE(SUM(p.amount), 0) as payment_sum,
+          COUNT(DISTINCT t.id) as transaction_count
+        FROM transactions t
+        LEFT JOIN payments p ON p.transaction_id = t.id
+        WHERE t.user_id = ${userId}
+        GROUP BY t.person_name
+      )
       SELECT
         person_name,
-        SUM(
-          CASE
-            WHEN type = 'lent_out' THEN amount
-            WHEN type = 'borrowed' THEN -amount
-          END
-        ) - COALESCE((
-          SELECT SUM(p.amount)
-          FROM payments p
-          WHERE p.transaction_id = transactions.id
-        ), 0) as balance,
-        COUNT(DISTINCT transactions.id) as transaction_count
-      FROM transactions
-      WHERE user_id = ${userId}
-      GROUP BY person_name
-      HAVING SUM(
-        CASE
-          WHEN type = 'lent_out' THEN amount
-          WHEN type = 'borrowed' THEN -amount
-        END
-      ) - COALESCE((
-        SELECT SUM(p.amount)
-        FROM payments p
-        WHERE p.transaction_id = transactions.id
-      ), 0) != 0
+        (transaction_sum - payment_sum) as balance,
+        transaction_count
+      FROM transaction_totals
+      WHERE (transaction_sum - payment_sum) != 0
       ORDER BY balance DESC
     `;
     return rows || [];
@@ -177,33 +173,16 @@ export async function getTotalBalance(userId: string): Promise<number> {
     SELECT
       COALESCE(SUM(
         CASE
-          WHEN type = 'lent_out' THEN amount
-          WHEN type = 'borrowed' THEN -amount
+          WHEN t.type = 'lent_out' THEN t.amount
+          WHEN t.type = 'borrowed' THEN -t.amount
         END
-      ), 0) as total
-    FROM transactions
-    WHERE user_id = ${userId}
+      ), 0) - COALESCE(SUM(p.amount), 0) as total
+    FROM transactions t
+    LEFT JOIN payments p ON p.transaction_id = t.id
+    WHERE t.user_id = ${userId}
   `;
 
-  const { rows: paymentRows } = await sql<{ total: number }>`
-    SELECT COALESCE(SUM(p.amount), 0) as total
-    FROM payments p
-    JOIN transactions t ON p.transaction_id = t.id
-    WHERE t.user_id = ${userId} AND t.type = 'lent_out'
-  `;
-
-  const { rows: paymentRows2 } = await sql<{ total: number }>`
-    SELECT COALESCE(SUM(p.amount), 0) as total
-    FROM payments p
-    JOIN transactions t ON p.transaction_id = t.id
-    WHERE t.user_id = ${userId} AND t.type = 'borrowed'
-  `;
-
-  const total = rows[0]?.total || 0;
-  const lentPayments = paymentRows[0]?.total || 0;
-  const borrowedPayments = paymentRows2[0]?.total || 0;
-
-  return total - (lentPayments - borrowedPayments);
+  return rows[0]?.total || 0;
 }
 
 export async function deleteTransaction(transactionId: number, userId: string) {
